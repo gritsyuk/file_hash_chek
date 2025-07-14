@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: ./backend
+    container_name: hash-backend
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/src/file_uploads.db:/app/src/file_uploads.db
+    expose:
+      - 8000
+    networks:
+      - appnet
+
+  frontend:
+    build: ./frontend
+    container_name: hash-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
