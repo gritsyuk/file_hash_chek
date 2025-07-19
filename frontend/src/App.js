@@ -3,31 +3,24 @@ import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import './App.css';
 
-// Функция для вычисления SHA-256 хеша файла
-const calculateHash = async (file) => {
-  const buffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
-};
-
 function App() {
   const [hashResult, setHashResult] = useState('');
   const [hashResultTimeout, setHashResultTimeout] = useState(null);
   const [verificationResult, setVerificationResult] = useState('');
   const [verificationTimeout, setVerificationTimeout] = useState(null);
-  const [hashToVerify, setHashToVerify] = useState('');
   const [uploads, setUploads] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
+  // Определяем базовый адрес API
+  const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : '/api';
+
   // Загрузка данных из /uploads
   useEffect(() => {
-    axios.get(`http://localhost:8000/uploads?limit=${rowsPerPage}&offset=${page * rowsPerPage}`)
+    axios.get(`${API_URL}/uploads?limit=${rowsPerPage}&offset=${page * rowsPerPage}`)
       .then(res => setUploads(res.data.uploads))
       .catch(() => setUploads([]));
-  }, [page, rowsPerPage, hashResult, verificationResult]);
+  }, [page, rowsPerPage, hashResult, verificationResult, API_URL]);
 
   // Обработчик для первой области (загрузка и получение хеша)
   const onDrop1 = useCallback(async (acceptedFiles) => {
@@ -36,7 +29,7 @@ function App() {
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
       try {
-        const response = await axios.post('http://localhost:8000/hash', formData, {
+        const response = await axios.post(`${API_URL}/hash`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -73,7 +66,7 @@ function App() {
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
       try {
-        const response = await axios.post('http://localhost:8000/verify-multi', formData, {
+        const response = await axios.post(`${API_URL}/verify-multi`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -100,9 +93,9 @@ function App() {
 
   // Функция удаления
   const handleDelete = async (file_hash) => {
-    await axios.delete(`http://localhost:8000/uploads/${file_hash}`);
+    await axios.delete(`${API_URL}/uploads/${file_hash}`);
     // Обновить таблицу
-    axios.get(`http://localhost:8000/uploads?limit=${rowsPerPage}&offset=${page * rowsPerPage}`)
+    axios.get(`${API_URL}/uploads?limit=${rowsPerPage}&offset=${page * rowsPerPage}`)
       .then(res => setUploads(res.data.uploads))
       .catch(() => setUploads([]));
   };
