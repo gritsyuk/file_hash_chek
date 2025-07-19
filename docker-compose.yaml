@@ -6,7 +6,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./backend/src/file_uploads.db:/app/src/file_uploads.db
+      - ./backend/src:/app/src
     expose:
       - 8000
     networks:
