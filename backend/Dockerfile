@@ -10,14 +10,14 @@ ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
 # Копируем только файлы зависимостей для кэширования слоёв
-COPY backend/pyproject.toml backend/uv.lock ./
+COPY pyproject.toml uv.lock ./
 
 # Устанавливаем зависимости (без dev)
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
 
 # Копируем исходный код приложения
-COPY backend/src ./src
+COPY src ./src
 
 EXPOSE 8000
 

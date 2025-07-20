@@ -5,8 +5,8 @@ services:
     restart: always
     environment:
       - PYTHONUNBUFFERED=1
-    volumes:
-      - ./backend/src:/app/src
+    # volumes:
+    #   - ./backend/src:/app/src
     expose:
       - 8000
     networks:
