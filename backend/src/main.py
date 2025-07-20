@@ -12,6 +12,8 @@ app = FastAPI()
 # Настройка CORS
 origins = [
     "http://localhost:3000",
+    "http://akvilon.bridgelife.ru",
+    "https://akvilon.bridgelife.ru",
 ]
 
 app.add_middleware(
